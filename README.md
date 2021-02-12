@@ -1,14 +1,11 @@
-
-
 ```
 $ pip install python-dotenv
 flask_sqlalchemy
 flask_migrate
 ```
 
-
-
 .env
+
 ```
 FLASK_ENV=development
 
@@ -29,11 +26,9 @@ SHOULD BE `/tasks`
 not `/tasks/`
 it gets to a weird spot in the browser if you leave it, and it gets sticky. debug with incognito or clearing cache
 
-
 Make model
 (import and install SQLAlchemy, migrate)
 Migrate enables `flask db upgrade`
-
 
 Open up PSQL and make the database you're looking for
 With what I have in the .env:
