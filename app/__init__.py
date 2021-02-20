@@ -21,7 +21,7 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    from .views import simple_page
-    app.register_blueprint(simple_page)
+    from .routes import task_page
+    app.register_blueprint(task_page)
 
     return app
