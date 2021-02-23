@@ -11,20 +11,6 @@ task_page = Blueprint('task_page', __name__)
 
 @task_page.route('/')
 def index():
-    url = "https://slack.com/api/chat.postMessage"
-    headers = {
-        'Authorization': 'Bearer xoxb-1504219248148-1787871315316-rItcWIHWHR0XFKo0PIwJB5IO'
-    }
-    payload = {
-        "channel": "secret-simon",
-        "text": "hello world from flask"
-    }
-    response = requests.post(url, data=payload, headers=headers)
-    return response.json()
-
-
-@task_page.route('/zoomcallback')
-def zoomcallback():
     return {
         "name": "Simon Del Rosario",
         "message": "Hi instructors! :)"
@@ -48,13 +34,10 @@ def build_task_from_json(json):
 @task_page.route('/tasks', methods=['GET', 'POST'])
 def tasks():
     if request.method == 'GET':
-        if request.args.get("sort"):
-            if request.args.get("sort") == "desc":
-                tasks = Task.query.order_by(Task.title.desc())
-            elif request.args.get("sort") == "asc":
-                tasks = Task.query.order_by(Task.title.asc())
-            else:
-                tasks = Task.query.all()
+        if request.args.get("sort") == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
+        elif request.args.get("sort") == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
         else:
             tasks = Task.query.all()
         results = []
@@ -174,13 +157,15 @@ def goal_tasks(goal_id):
     goal = Goal.query.get_or_404(goal_id)
 
     if request.method == 'GET':
-        task_ids = []
+        tasks = []
 
         for task in goal.tasks:
-            task_ids.append(task.task_id)
+            tasks.append(build_dict_from_task(task))
 
         return {
-            "task_ids": task_ids
+            "id": goal.goal_id,
+            "title": goal.title,
+            "tasks": tasks
         }
 
     if request.method == 'POST':
@@ -204,5 +189,3 @@ def goal_tasks(goal_id):
             "id": goal.goal_id,
             "task_ids": response_task_ids
         }
-
-

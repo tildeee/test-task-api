@@ -1,284 +1,105 @@
-```
-$ pip install python-dotenv
-flask_sqlalchemy
-flask_migrate
+# Task List
+
+## One-time Setup
+
+Create a virtual environment:
+
+```bash
+$ python3 -m venv venv
+$ source venv/bin/activate
+(venv) $ # You're in activated virtual environment!
 ```
 
-.env
+Install dependencies (we've already gathered them all into a `requirements.txt` file):
+
+```bash
+(venv) $ pip install -r requirements.txt
+```
+
+Setup your `.env` file:
+
+(Feel free to copy mine, but here's an explanation:)
 
 ```
 FLASK_ENV=development
 
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:postgres@localhost:5432/task_list_flask
+
+SQLALCHEMY_TEST_DATABASE_URI=postgresql+psycopg2://postgres:postgres@localhost:5432/test_task_list_flask
+
+SLACK_BOT_TOKEN = xoxb-15
 ```
 
-Run with
+1. `FLASK_ENV` as `development` enables hot-reloading
+1. `SQLALCHEMY_DATABASE_URI` we'll use this when we need to tell SQLAlchemy where the database is
+  - The `postgresql+` bit is just random stuff I copied/pasted from the internet, I have no idea how much is needed, but I know it's compatible with Heroku deployment ;)
+  - In the curriculum, we'll direct students to make a postgres user named `postgres` soooo probably keep that
+  - **Replace this if you want**: `task_list_flask` is the name of the database I put. It's more likely that the best name for this is `task_list_development` (tho this overrides the rails db)
+1. `SQLALCHEMY_TEST_DATABASE_URI` we'll use this as test db
+  - As of right now, I don't know why my project breaks with this
+1. `SLACK_BOT_TOKEN` what's uuuuppp
 
-```
-$ export FLASK_ENV=development
-$ flask run
-```
+## Simon's Debugging Tips
 
-Make first route
+When in doubt:
 
-REALLY IMPORTANT to not have trailing slash
-SHOULD BE `/tasks`
-not `/tasks/`
-it gets to a weird spot in the browser if you leave it, and it gets sticky. debug with incognito or clearing cache
+- Restart the server
+  - Seriously
+  - I probably do this every third change. The hot-reloading kinda sucks (better than nothing)
+- You can safely run `flask db migrate` and `flask db upgrade` as many times as you'd like
+  - `migrate` says "make migrations if you detect a need for new ones"
+  - `upgrade` says "do the migrations"
+- Don't forget to debug with the logs from the Flask server!!! They will be your friend!!!!!!
+- VS Code Flask debugging ain't bad.
+    1. close other server
+    1. click on buggy play button on the left
+    1. make a new config: top left corner with play button + dropdown, click "Add Configuration" and select "Python: Flask"
+    1. Then click the green play button up there whenever u want
+    1. The controls are in the top right corner, so press the stop button (red square) whenever. Press green play to re-run.
+    1. Breakpoints work!! so you'll have to switch between Postman and vscode a bunch
 
-Make model
-(import and install SQLAlchemy, migrate)
-Migrate enables `flask db upgrade`
+## Wave 1: CRUD on Task model
 
-Open up PSQL and make the database you're looking for
-With what I have in the .env:
-
-```
-psql -U postgres
-
-\l
-
-CREATE DATABASE task_list_flask;
-
-\l
-
-\quit
-```
-
-Run `flask db init`
-Run `flask db migrate`
-Run `flask db upgrade` after
-
-This happened in the middle after i started running `flask db upgrade`, which is weird, but whatever. Still do it
-
-```
-$ pip install psycopg2
-```
-
-Do this after models.
-
-```
-db.create_all()
-db.session.commit()
-```
-
-This style (and not in `create_app()`) is that we don't need a context.
-
-MAKING A POST REQUEST FROM POSTMAN:
-
-POST localhost:5000/tasks
-
-no params
-go to body
-raw
-select "JSON" in dropdown next to it
-
-```json
-{
-  "hello": "wofrld"
-}
-```
-
-DEBUGGING:
-
-restart server
-run flask migrate
-run flask upgrade
-
-route questions?
+In `app/routes.py`, make these routes, assuming this Blueprint (this blueprint should probably be renamed? Looking for better names):
 
 ```python
-print(app.url_map)
+# Put this line at the top of routes.py, after the imports. This is what defines the "Blueprint", which is an object that will organize all of the routes. (The name in the decorator comes from here)
+task_page = Blueprint('task_page', __name__)
 ```
 
-The create_all() method only creates table if it doesn't already exist in the database. So you can run it safely multiple times. In addition to that, the create_all() method doesn't take account of the modifications made to the models while creating tables.
+### Test Home Route
 
-i had to flask migrate after adding some columns?
-
----
-
-# tests
-
-for some reason, hardcoding/string literal the test database url was the only way it worked. couldn't find it as an env var
-
-for some reason, i needed to manually create the tasks table and all of the columns. after that it was great
-
-
----
-
-wave:
-
-CRUD on tasks
-
-wave:
-
-complete tasks
-
-wave:
-
-when completing tasks, posts a notice to Slack API
-
-Theoretically, we could really all use the same Slack bot
-
-
----
-
-
-
-MAKING SLACK BOT INSTRUCTIONS. Point is to get a slack bot created, has the right permissions, authorized in the workspace, and get the bot token
-
-https://api.slack.com/
-
-Go to "Your Apps"/sign in. You can always go back to the "Your apps" page on the top right.
-
-Pick a workspace
-
-Make a new app. Fill out:
-1. App name
-1. Development slack workspace
-
-brings you to a new page. 
-
-Add features and functionality:
-
-1. click permissions
-1. Scroll down to bot token scopes. Add chat:write and chat:write.public
-1. Scroll back up: "install to workspace" is enabled. click that button.
-1. Brings you to the authorization page that says "hey hUMAN, ARE YOU GOOD WITH THIS?" Say yes. check out the permissions
-1. After you say yes, it should list in "OAuth Tokens for your team" and "Bot User OAuth Access Token". That value is your bot token. Should always start with `xoxb`
-1. Copy the token. Whenever you want to get back here, go to "Your apps" (top right), click your app, open "features and functionality", go to "OAuth & Permissions"
-
-Verify
-
-1. Go to test https://api.slack.com/methods/chat.postMessage/test (if you click on the tab "Documentation", it will show you all the documentation)
-1. Fill out the following params:
-  - token: paste in your bot token
-  - channel: use "test"
-  - text: type a nice message for everyone to read
-1. Hit Test Method button
-1. Scroll down to see the response
-  - admire the URL + header it's giving you
-
-
-Verify AGAIN
-
-1. open postman
-1. make a new request
-  - open new tab
-  - change method to POST
-  - use this as request URL `https://slack.com/api/chat.postMessage`
-  - in "Params", fill the following values:
-    - channel: "test"
-    - text: "asdfsdf"
-  - go to "Headers" and add this new key value pair
-    - Authorization: "Bearer xoxb-1504219248148-1787871315316-rItcWIHWHR0XFKo0PIwJB5IO"
-    - NB: Instead of this, you COULD put in a param of token: token. It works. Better to do this method tho
-
-
-NOW ADD TO FLASK
-
-import requests
-
-Requests module
-https://requests.readthedocs.io/en/master/user/quickstart/
-
+Make this route for a sanity check, and replace the values of `"name"` and `"message"` with your own name and message.
 
 ```python
 @task_page.route('/')
 def index():
-    url = "https://slack.com/api/chat.postMessage"
-    headers = {
-        'Authorization': 'Bearer xoxb-1504219248148-1787871315316-rItcWIHWHR0XFKo0PIwJB5IO'
+    return {
+        "name": "Simon Del Rosario",
+        "message": "Hi instructors! :)"
     }
-    payload = {
-        "channel": "secret-simon",
-        "text": "hello world from flask"
-    }
-    response = requests.post(url, data=payload, headers=headers)
-    return response.json()
 ```
 
+Run `(venv) $ flask run` to get this going!!
 
-when debugging postman, debug with logs from flask server
+Keep reading in [the Wave 01 doc](wave_01.md)
 
------
+## Wave 2: Sort by title on Task List
 
-wave
+[Wave 02 doc](wave_02.md)
 
-add goal model
+## Wave : Complete a Task
 
-DECLARING MODELS
-optional in Flask-SQLAlchemy. For instance the table name is automatically set for you unless overridden. It’s derived from the class name converted to lowercase and with “CamelCase” converted to “camel_case”. To override the table name, set the `__tablename__` class attribute.
+[Wave 03 doc](complete_task.md)
 
-don't need `__tablename__`
+## Wave : Completing a Task Notification
 
-one goal has many addresses
+[Wave 04 doc](slack_notification.md)
 
-Make goal model
+## Wave : CRUD on Goal model
 
-`backref` is a simple way to also declare a new property on the Address class. You can then also use my_address.person to get to the person at that address.
+[Wave 05 doc](goal_crud.md)
 
-update Task to have goal_id
+## Wave : Goals and Tasks
 
-```
-goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'),
-      nullable=False)
-```
-
-
-WHEN RUNNING FLASK DB MIGRATE, FLASK DB UPGRADE
-Alembic will always post "INFO" messages, which doesn't really matter, it's just info, not a warning
-you can change this with changing alembic config
-
-
-Goals:
-
-CRUD
-
-don't forget to import Goal ;)
-
-everything you need to know about models with sql_alchemy
-how to make models and their relationships:
-https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/
-
-what we can do with models:
-https://flask-sqlalchemy.palletsprojects.com/en/2.x/queries/
-
-To see every kind of query we can make, go here
-https://flask-sqlalchemy.palletsprojects.com/en/2.x/api/#flask_sqlalchemy.BaseQuery
-(We want the header for BaseQuery)
-
-
-sqlalchemy composition stuff. use append and kwargs with model objs
-
-```python
-a = Address(email='foo@bar.com')
-p = Person(name='foo')
-p.addresses.append(a)
-```
-
-look we can do .addresses.count(), .addresses[], .addresses.filter_by()
-```python
-db.session.add(p)
-db.session.add(a)
-db.session.commit()
-print p.addresses.count() # 1
-print p.addresses[0] # <Address object at 0x10c098ed0>
-print p.addresses.filter_by(email='foo@bar.com').count() # 1
-```
-
-
-NEW ROUTE:
-
-
-POST
-`/goals/<goal_id>/tasks`
-
-request body:
-
-```json
-{
-  "task_ids": []
-}
-```
-
+[Wave 06 doc](goals_and_tasks.md)
