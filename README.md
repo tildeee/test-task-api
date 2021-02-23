@@ -32,11 +32,15 @@ SLACK_BOT_TOKEN = xoxb-15
 
 1. `FLASK_ENV` as `development` enables hot-reloading
 1. `SQLALCHEMY_DATABASE_URI` we'll use this when we need to tell SQLAlchemy where the database is
-  - The `postgresql+` bit is just random stuff I copied/pasted from the internet, I have no idea how much is needed, but I know it's compatible with Heroku deployment ;)
-  - In the curriculum, we'll direct students to make a postgres user named `postgres` soooo probably keep that
-  - **Replace this if you want**: `task_list_flask` is the name of the database I put. It's more likely that the best name for this is `task_list_development` (tho this overrides the rails db)
+
+- The `postgresql+` bit is just random stuff I copied/pasted from the internet, I have no idea how much is needed, but I know it's compatible with Heroku deployment ;)
+- In the curriculum, we'll direct students to make a postgres user named `postgres` soooo probably keep that
+- **Replace this if you want**: `task_list_flask` is the name of the database I put. It's more likely that the best name for this is `task_list_development` (tho this overrides the rails db)
+
 1. `SQLALCHEMY_TEST_DATABASE_URI` we'll use this as test db
-  - As of right now, I don't know why my project breaks with this
+
+- As of right now, I don't know why my project breaks with this
+
 1. `SLACK_BOT_TOKEN` what's uuuuppp
 
 ## Simon's Debugging Tips
@@ -51,12 +55,12 @@ When in doubt:
   - `upgrade` says "do the migrations"
 - Don't forget to debug with the logs from the Flask server!!! They will be your friend!!!!!!
 - VS Code Flask debugging ain't bad.
-    1. close other server
-    1. click on buggy play button on the left
-    1. make a new config: top left corner with play button + dropdown, click "Add Configuration" and select "Python: Flask"
-    1. Then click the green play button up there whenever u want
-    1. The controls are in the top right corner, so press the stop button (red square) whenever. Press green play to re-run.
-    1. Breakpoints work!! so you'll have to switch between Postman and vscode a bunch
+  1. close other server
+  1. click on buggy play button on the left
+  1. make a new config: top left corner with play button + dropdown, click "Add Configuration" and select "Python: Flask"
+  1. Then click the green play button up there whenever u want
+  1. The controls are in the top right corner, so press the stop button (red square) whenever. Press green play to re-run.
+  1. Breakpoints work!! so you'll have to switch between Postman and vscode a bunch
 
 ## Wave 1: CRUD on Task model
 
@@ -103,3 +107,8 @@ Keep reading in [the Wave 01 doc](wave_01.md)
 ## Wave : Goals and Tasks
 
 [Wave 06 doc](goals_and_tasks.md)
+
+## TODO
+
+- Tests
+- Make a guide for how to read the setup/config files
