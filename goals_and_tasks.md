@@ -82,3 +82,32 @@ Hints:
 - Add a task to a goal with `goal.tasks.append(task)`
     - I haven't gotten `task.goal = goal` to work
 - Don't forget to `db.session.commit()`
+
+## Revisit `GET /tasks/<task_id>`
+
+A task with a goal set should respond like this:
+
+```json
+{
+    "task": {
+        "description": "Test Description",
+        "goal_id": 3,
+        "id": 7,
+        "is_complete": false,
+        "title": "c"
+    }
+}
+```
+
+A task without a goal should still respond like this:
+
+```json
+{
+    "task": {
+        "description": "Test Description",
+        "id": 5,
+        "is_complete": false,
+        "title": "a"
+    }
+}
+```

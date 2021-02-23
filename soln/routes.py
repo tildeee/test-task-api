@@ -19,12 +19,15 @@ def index():
 
 def build_dict_from_task(task):
     is_complete = True if task.completed_at else False
-    return {
+    dict = {
         "id": task.task_id,
         "title": task.title,
         "description": task.description,
         "is_complete": is_complete
     }
+    if task.goal_id:
+        dict["goal_id"] = task.goal_id
+    return dict
 
 
 def build_task_from_json(json):
