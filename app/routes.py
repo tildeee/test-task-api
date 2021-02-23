@@ -1,13 +1,30 @@
 from flask import Flask, Blueprint, request, jsonify, redirect, url_for
-from app.models import Task
+from app.models import Task, Goal
 from app import db
 from datetime import datetime
+
+import os
+import requests
 
 task_page = Blueprint('task_page', __name__)
 
 
 @task_page.route('/')
 def index():
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        'Authorization': 'Bearer xoxb-1504219248148-1787871315316-rItcWIHWHR0XFKo0PIwJB5IO'
+    }
+    payload = {
+        "channel": "secret-simon",
+        "text": "hello world from flask"
+    }
+    response = requests.post(url, data=payload, headers=headers)
+    return response.json()
+
+
+@task_page.route('/zoomcallback')
+def zoomcallback():
     return {
         "name": "Simon Del Rosario",
         "message": "Hi instructors! :)"
@@ -31,7 +48,15 @@ def build_task_from_json(json):
 @task_page.route('/tasks', methods=['GET', 'POST'])
 def tasks():
     if request.method == 'GET':
-        tasks = Task.query.all()
+        if request.args.get("sort"):
+            if request.args.get("sort") == "desc":
+                tasks = Task.query.order_by(Task.title.desc())
+            elif request.args.get("sort") == "asc":
+                tasks = Task.query.order_by(Task.title.asc())
+            else:
+                tasks = Task.query.all()
+        else:
+            tasks = Task.query.all()
         results = []
         for task in tasks:
             results.append(build_dict_from_task(task))
@@ -67,6 +92,19 @@ def task(task_id):
         return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}
 
 
+def post_task_complete_to_slack(message):
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        'Authorization': f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"
+    }
+    payload = {
+        "channel": "secret-simon",
+        "text": message
+    }
+    response = requests.post(url, data=payload, headers=headers)
+    return response.json()
+
+
 @task_page.route('/tasks/<task_id>/complete', methods=['PATCH'])
 def toggle_complete(task_id):
     task = Task.query.get_or_404(task_id)
@@ -75,10 +113,96 @@ def toggle_complete(task_id):
         task.completed_at = None
     else:
         task.completed_at = datetime.utcnow()
+        slack_response = post_task_complete_to_slack(
+            f"Someone just completed the task {task.title}")
 
     db.session.commit()
 
     return {"task": build_dict_from_task(task)}
 
+
+def build_dict_from_goal(goal):
+    return {
+        "id": goal.goal_id,
+        "title": goal.title
+    }
+
+
+def build_goal_from_json(json):
+    return Goal(title=json["title"])
+
+
+@task_page.route('/goals', methods=['GET', 'POST'])
+def goals():
+    if request.method == 'GET':
+        goals = Goal.query.all()
+        results = []
+        for goal in goals:
+            results.append(build_dict_from_goal(goal))
+        return jsonify(results)
+    elif request.method == 'POST':
+        new_goal = build_goal_from_json(request.get_json())
+
+        db.session.add(new_goal)
+        db.session.commit()
+
+        return {"task": build_dict_from_goal(new_goal)}
+
+
+@task_page.route('/goals/<goal_id>', methods=['GET', 'PUT', 'DELETE'])
+def goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+
+    if request.method == 'GET':
+        return {"goal": build_dict_from_goal(goal)}
+    elif request.method == 'PUT':
+        form_data = request.get_json()
+
+        goal.title = form_data['title']
+
+        db.session.commit()
+
+        return {"goal": build_dict_from_goal(goal)}
+    elif request.method == 'DELETE':
+        db.session.delete(goal)
+        db.session.commit()
+        return {"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}
+
+
+@task_page.route('/goals/<goal_id>/tasks', methods=['GET', 'POST'])
+def goal_tasks(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+
+    if request.method == 'GET':
+        task_ids = []
+
+        for task in goal.tasks:
+            task_ids.append(task.task_id)
+
+        return {
+            "task_ids": task_ids
+        }
+
+    if request.method == 'POST':
+        goal.tasks = []
+
+        form_data = request.get_json()
+
+        task_ids = form_data['task_ids']
+
+        for task_id in task_ids:
+            task = Task.query.get_or_404(task_id)
+            goal.tasks.append(task)
+
+        db.session.commit()
+
+        response_task_ids = []
+        for task in goal.tasks:
+            response_task_ids.append(task.task_id)
+
+        return {
+            "id": goal.goal_id,
+            "task_ids": response_task_ids
+        }
 
 

@@ -7,12 +7,18 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        "SQLALCHEMY_DATABASE_URI")
+    if test_config is None:
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+            "SQLALCHEMY_DATABASE_URI")
+    else:
+        app.config['DEBUG'] = True
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:postgres@localhost:5432/test_task_list_flask"
 
     db.init_app(app)
     migrate.init_app(app, db)
