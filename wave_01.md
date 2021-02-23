@@ -2,7 +2,7 @@
 
 ## Structure
 
-1. Goal requests/responses
+1. Description of Task CRUD requests/responses
 1. Task model requirements (and walkthrough)
 1. Writing our routes walkthrough
 1. Postman walkthrough
