@@ -32,16 +32,12 @@ SLACK_BOT_TOKEN = xoxb-15
 
 1. `FLASK_ENV` as `development` enables hot-reloading
 1. `SQLALCHEMY_DATABASE_URI` we'll use this when we need to tell SQLAlchemy where the database is
-
-- The `postgresql+` bit is just random stuff I copied/pasted from the internet, I have no idea how much is needed, but I know it's compatible with Heroku deployment ;)
-- In the curriculum, we'll direct students to make a postgres user named `postgres` soooo probably keep that
-- **Replace this if you want**: `task_list_flask` is the name of the database I put. It's more likely that the best name for this is `task_list_development` (tho this overrides the rails db)
-
+    - The `postgresql+` bit is just random stuff I copied/pasted from the internet, I have no idea how much is needed, but I know it's compatible with Heroku deployment ;)
+    - In the curriculum, we'll direct students to make a postgres user named `postgres` soooo probably keep that
+    - **Replace this if you want**: `task_list_flask` is the name of the database I put. It's more likely that the best name for this is `task_list_development` (tho this overrides the rails db)
 1. `SQLALCHEMY_TEST_DATABASE_URI` we'll use this as test db
-
-- As of right now, I don't know why my project breaks with this
-
-1. `SLACK_BOT_TOKEN` what's uuuuppp
+    - As of right now, I don't know why my project breaks with this
+1. `SLACK_BOT_TOKEN` what's uuuuppp. Message me for me, but instructions are in the relevant wave, too
 
 ## Simon's Debugging Tips
 
@@ -111,4 +107,6 @@ Keep reading in [the Wave 01 doc](wave_01.md)
 ## TODO
 
 - Tests
+- Confirm the Blueprint strategy (just `task_page`? Add path prefix? etc)
 - Make a guide for how to read the setup/config files
+- Spec out the Marshmallow refactor
