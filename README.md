@@ -104,9 +104,15 @@ Keep reading in [the Wave 01 doc](wave_01.md)
 
 [Wave 06 doc](goals_and_tasks.md)
 
+## Wave : Deploy
+
+Deploying an API on heroku using postgres is reliably straightforward.
+
 ## TODO
 
 - Tests
 - Confirm the Blueprint strategy (just `task_page`? Add path prefix? etc)
 - Make a guide for how to read the setup/config files
 - Spec out the Marshmallow refactor
+- Figure out if there's room for many-to-many with Tags
+- Probably add "filter by completion" somewhere
