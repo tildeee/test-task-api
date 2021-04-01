@@ -4,7 +4,6 @@ from datetime import datetime
 
 
 class Task(db.Model):
-    __tablename__ = 'tasks'
 
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
