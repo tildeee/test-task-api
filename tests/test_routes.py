@@ -1,4 +1,5 @@
-import pytest
+from flask import url_for
+from app.routes import task_page
 
 
 def test_index(client):
@@ -8,8 +9,10 @@ def test_index(client):
     assert "message" in response_body
 
 
-def test_get_tasks_no_saved_tasks_test(client):
-    response = client.get("/tasks")
+def test_get_tasks_no_saved_tasks(client):
+    response = client.get("/tasks/1")
+
+    assert response.status_code == 404
 
     response_body = response.get_json()
 
