@@ -16,6 +16,14 @@ Install dependencies (we've already gathered them all into a `requirements.txt` 
 (venv) $ pip install -r requirements.txt
 ```
 
+Set up your database using psql.
+
+Create two databases:
+
+1. A development database named `task_list_development`
+1. A test database 
+
+
 Setup your `.env` file:
 
 (Feel free to copy mine, but here's an explanation:)

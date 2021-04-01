@@ -23,7 +23,8 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app.models import Task
+    from app.models.task import Task
+    from app.models.goal import Goal
     with app.app_context():
         db.create_all()
 

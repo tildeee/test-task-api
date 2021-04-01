@@ -1,5 +1,8 @@
-from flask import Flask, Blueprint, request, jsonify, redirect, url_for
-from app.models import Task, Goal
+from flask import request, Blueprint, Response
+from flask import Flask, Blueprint, request, jsonify, redirect, url_for, Response
+from app.models.task import Task
+from app.models.goal import Goal
+from app.models.book import Book
 from app import db
 from datetime import datetime
 
@@ -11,10 +14,43 @@ task_page = Blueprint('task_page', __name__)
 
 @task_page.route('/')
 def index():
-    return {
-        "name": "Simon Del Rosaasfasdfrio",
-        "message": "Hi instructors! :)"
-    }
+    return Response("", 201)
+
+
+books_bp = Blueprint('books_bp', __name__)
+
+
+# @books_bp.route('/books', methods=['GET', 'POST'])
+# def books():
+#     if request.method == 'GET':
+#         return {"sup": "hi"}
+#     else:
+#         response_body = request.get_json()
+#         new_book = Book(
+#             title=response_body["title"],
+#             description=response_body["description"]
+#         )
+
+#         db.session.add(new_book)
+#         db.session.commit()
+
+#         return Response(f"book_id {new_book.book_id}, title {new_book.title}, description {new_book.description}", status=201)
+
+@books_bp.route('/books', methods=['GET', 'POST'])
+def books():
+    if request.method == 'GET':
+        return {"sup": "hi"}
+    else:
+        response_body = request.get_json()
+        new_book = Book(
+            title=response_body["title"],
+            description=response_body["description"]
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return Response(f"book_id {new_book.book_id}, title {new_book.title}, description {new_book.description}", status=201)
 
 
 def build_dict_from_task(task):
