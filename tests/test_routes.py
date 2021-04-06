@@ -7,11 +7,9 @@ def test_index(client):
 
 def test_get_tasks_no_saved_tasks(client):
     response = client.get("/tasks")
-
-    assert response.status_code == 200
-
     response_body = response.get_json()
 
+    assert response.status_code == 200
     assert response_body == []
 
 
@@ -108,6 +106,7 @@ def test_delete_task(client, one_task):
     # Check that the task was deleted
     response = client.get("/tasks/1")
     assert response.status_code == 404
+
 
 def test_delete_task_not_found(client):
     response = client.delete("/tasks/1")
