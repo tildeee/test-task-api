@@ -2,6 +2,7 @@ import pytest
 from app import create_app
 from app.models.task import Task
 from app import db
+from datetime import datetime
 
 
 @pytest.fixture
@@ -40,4 +41,12 @@ def three_tasks(app):
         Task(
             title="Pay my outstanding tickets 😭", description="", completed_at=None)
     ])
+    db.session.commit()
+
+
+@pytest.fixture
+def completed_task(app):
+    new_task = Task(
+        title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=datetime.utcnow())
+    db.session.add(new_task)
     db.session.commit()
