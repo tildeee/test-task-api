@@ -133,7 +133,7 @@ def goals():
         db.session.add(new_goal)
         db.session.commit()
 
-        return {"task": build_dict_from_goal(new_goal)}
+        return {"goal": build_dict_from_goal(new_goal)}
 
 
 @task_page.route('/goals/<goal_id>', methods=['GET', 'PUT', 'DELETE'])

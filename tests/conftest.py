@@ -1,6 +1,7 @@
 import pytest
 from app import create_app
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from datetime import datetime
 
@@ -49,4 +50,11 @@ def completed_task(app):
     new_task = Task(
         title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=datetime.utcnow())
     db.session.add(new_task)
+    db.session.commit()
+
+
+@pytest.fixture
+def one_goal(app):
+    new_goal = Goal(title="Build a habit of going outside daily")
+    db.session.add(new_goal)
     db.session.commit()
