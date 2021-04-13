@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, jsonify, redirect, url_for
+from flask import Flask, Blueprint, request, jsonify, redirect, url_for, make_response
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
@@ -35,6 +35,10 @@ def build_task_from_json(json):
     return Task(title=json["title"], description=json["description"], completed_at=json["completed_at"])
 
 
+def is_task_body_valid(body):
+    return ("title" in body) and ("description" in body) and ("completed_at" in body)
+
+
 @task_page.route('/tasks', methods=['GET', 'POST'])
 def tasks():
     if request.method == 'GET':
@@ -49,7 +53,12 @@ def tasks():
             results.append(build_dict_from_task(task))
         return jsonify(results)
     elif request.method == 'POST':
-        new_task = build_task_from_json(request.get_json())
+        body = request.get_json()
+        if not is_task_body_valid(body):
+            return make_response(jsonify({
+                "details": "Invalid data"
+            }), 400)
+        new_task = build_task_from_json(body)
 
         db.session.add(new_task)
         db.session.commit()
@@ -119,6 +128,10 @@ def build_goal_from_json(json):
     return Goal(title=json["title"])
 
 
+def is_goal_body_valid(body):
+    return "title" in body
+
+
 @task_page.route('/goals', methods=['GET', 'POST'])
 def goals():
     if request.method == 'GET':
@@ -128,7 +141,12 @@ def goals():
             results.append(build_dict_from_goal(goal))
         return jsonify(results)
     elif request.method == 'POST':
-        new_goal = build_goal_from_json(request.get_json())
+        body = request.get_json()
+        if not is_goal_body_valid(body):
+            return make_response(jsonify({
+                "details": "Invalid data"
+            }), 400)
+        new_goal = build_goal_from_json(body)
 
         db.session.add(new_goal)
         db.session.commit()

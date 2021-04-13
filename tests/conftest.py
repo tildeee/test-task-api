@@ -23,7 +23,9 @@ def app():
 def client(app):
     return app.test_client()
 
-
+# This fixture gets called in every test that
+# references "one_task"
+# This fixture creates a task and saves it in the database
 @pytest.fixture
 def one_task(app):
     new_task = Task(
@@ -32,6 +34,10 @@ def one_task(app):
     db.session.commit()
 
 
+# This fixture gets called in every test that
+# references "three_tasks"
+# This fixture creates three tasks and saves
+# them in the database
 @pytest.fixture
 def three_tasks(app):
     db.session.add_all([
@@ -45,6 +51,10 @@ def three_tasks(app):
     db.session.commit()
 
 
+# This fixture gets called in every test that
+# references "completed_task"
+# This fixture creates a task with a
+# valid completed_at date
 @pytest.fixture
 def completed_task(app):
     new_task = Task(
@@ -53,6 +63,9 @@ def completed_task(app):
     db.session.commit()
 
 
+# This fixture gets called in every test that
+# references "one_goal"
+# This fixture creates a goal and saves it in the database
 @pytest.fixture
 def one_goal(app):
     new_goal = Goal(title="Build a habit of going outside daily")
@@ -60,6 +73,11 @@ def one_goal(app):
     db.session.commit()
 
 
+# This fixture gets called in every test that
+# references "one_task_belongs_to_one_goal"
+# This fixture creates a task and a goal
+# It associates the goal and task, so that the
+# goal has this task, and the task belongs to one goal
 @pytest.fixture
 def one_task_belongs_to_one_goal(app, one_goal, one_task):
     task = Task.query.first()

@@ -123,3 +123,15 @@ def test_delete_goal_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == None
+
+
+def test_create_goal_missing_title(client):
+    # Act
+    response = client.post("/goals", json={})
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {
+        "details": "Invalid data"
+    }
